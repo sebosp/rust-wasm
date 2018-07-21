@@ -3,8 +3,8 @@
 # Declare variables to be passed into your templates.
 replicaCount: 1
 image:
-  repository: draft
-  tag: dev
+  repository: 10.11.250.208:5000/sebosp/rust-wasm
+  tag: 0.0.1
   pullPolicy: IfNotPresent
 service:
   name: rust-wasm
