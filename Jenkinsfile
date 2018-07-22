@@ -29,7 +29,7 @@ pipeline {
     }
     stage('CI Build and push snapshot') {
       when {
-        branch 'feature/*'
+        branch 'feature_*'
       }
       environment {
         PREVIEW_VERSION = "0.0.0-SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER"
