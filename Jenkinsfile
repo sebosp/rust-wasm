@@ -19,7 +19,23 @@ pipeline {
           HELM_RELEASE = "$PREVIEW_NAMESPACE".toLowerCase()
         }
         steps {
-          container("rust") {
+          container('rust') {
+            sh 'rustup override set nightly'
+            sh 'rustup default nightly'
+            sh 'rustup target add wasm32-unknown-unknown --toolchain nightly'
+            sh 'cargo install wasm-gc'
+            sh 'git clone --depth 1 https://github.com/juj/emsdk.git'
+            sh 'cd emsdk'
+            sh './emsdk install latest'
+            sh './emsdk activate latest'
+            sh 'cargo +nightly build --target wasm32-unknown-unknown --release'
+            sh 'wasm-gc target/wasm32-unknown-unknown/release/wasm_data.wasm -o target/wasm32-unknown-unknown/release/wasm_data.gc.wasm'
+            stash includes: 'target/wasm32-unknown-unknown/release/wasm_data.gc.wasm', name: 'wasm_data'
+	  }
+	  dir ('./static') {
+	    unstash 'wasm_data'
+	  }
+          container('rust') {
             sh 'rustup override set nightly'
             sh 'cargo install'
             sh "cp ~/.cargo/bin/rust-wasm ."
