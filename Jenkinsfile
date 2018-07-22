@@ -1,5 +1,4 @@
 pipeline {
-    def rustVersion = '1.27.1'
     agent {
         label "jenkins-rust"
     }
@@ -7,6 +6,7 @@ pipeline {
       ORG               = 'sebosp'
       APP_NAME          = 'rust-wasm'
       CHARTMUSEUM_CREDS = credentials('jenkins-x-chartmuseum')
+      RUST_VERSION      = '1.27.1'
     }
     stages {
       stage('CI Build and push snapshot') {
@@ -19,13 +19,13 @@ pipeline {
           HELM_RELEASE = "$PREVIEW_NAMESPACE".toLowerCase()
         }
         steps {
-          container("sebosp/rust-wasm-base:${rustVersion}") {
+          container("sebosp/rust-wasm-base:${RUST_VERSION}") {
             sh 'cd wasm-data'
             sh 'cargo +nightly build --target wasm32-unknown-unknown --release'
             sh 'wasm-gc target/wasm32-unknown-unknown/release/wasm_data.wasm -o target/wasm32-unknown-unknown/release/wasm_data.gc.wasm'
             stash includes: '*/target/wasm32-unknown-unknown/release/wasm_data_gc.wasm', name: 'wasm-gc'
           }
-          container("rust:${rustVersion}") {
+          container("rust:${RUST_VERSION}") {
 	    dir('./static') {
               unstash 'wasm-gc'
 	    }
