@@ -19,7 +19,7 @@ pipeline {
           HELM_RELEASE = "$PREVIEW_NAMESPACE".toLowerCase()
         }
         steps {
-          container("rust:${RUST_VERSION}") {
+          container("rust") {
             sh 'rustup override set nightly'
             sh 'cargo install'
             sh "cp ~/.cargo/bin/rust-wasm ."
