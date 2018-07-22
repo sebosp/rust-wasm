@@ -19,7 +19,7 @@ pipeline {
           HELM_RELEASE = "$PREVIEW_NAMESPACE".toLowerCase()
         }
         steps {
-          container("sebosp/rust-wasm-base:${RUST_VERSION}") {
+          container("registry.hub.docker.com/sebosp/rust-wasm-base:${RUST_VERSION}") {
             sh 'cd wasm-data'
             sh 'cargo +nightly build --target wasm32-unknown-unknown --release'
             sh 'wasm-gc target/wasm32-unknown-unknown/release/wasm_data.wasm -o target/wasm32-unknown-unknown/release/wasm_data.gc.wasm'
