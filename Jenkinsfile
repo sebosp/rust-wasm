@@ -1,4 +1,5 @@
 pipeline {
+    def rustVersion = '1.27.1'
     agent {
         label "jenkins-rust"
     }
@@ -18,10 +19,18 @@ pipeline {
           HELM_RELEASE = "$PREVIEW_NAMESPACE".toLowerCase()
         }
         steps {
-          container('rust') {
-            // seems we need to upgrade rust else we get compile errors using Rust 1.24.1
+          container("sebosp/rust-wasm-base:${rustVersion}") {
+            sh 'cd wasm-data'
+            sh 'cargo +nightly build --target wasm32-unknown-unknown --release'
+            sh 'wasm-gc target/wasm32-unknown-unknown/release/wasm_data.wasm -o target/wasm32-unknown-unknown/release/wasm_data.gc.wasm'
+            stash includes: '*/target/wasm32-unknown-unknown/release/wasm_data_gc.wasm', name: 'wasm-gc'
+          }
+          container("rust:${rustVersion}") {
+	    dir('./static') {
+              unstash 'wasm-gc'
+	    }
             sh 'rustup override set nightly'
-            sh "cargo install"
+            sh 'cargo install'
             sh "cp ~/.cargo/bin/rust-wasm ."
 
             sh 'export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml'

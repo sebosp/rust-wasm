@@ -1,0 +1,9 @@
+[package]
+name = "wasm_data"
+version = "0.1.0"
+authors = ["Seb Ospina"]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]

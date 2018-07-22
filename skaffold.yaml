@@ -28,4 +28,4 @@ profiles:
         chartPath: charts/rust-wasm
         setValueTemplates:
           image.repository: "{{.DOCKER_REGISTRY}}/sebosp/rust-wasm"
-          image.tag: "{{.TAG}}"
+          image.tag: "{{.DIGEST_HEX}}"

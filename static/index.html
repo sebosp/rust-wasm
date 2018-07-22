@@ -1,7 +1,16 @@
-
-
-<a>
-  <img border="0" src="http://jenkins-x.io/images/logo.png" width="300" height="300"/>
-</a>
-
-<h1>Hi from Jenkins X!</h1>
+<!DOCTYPE html>
+<html>
+  <head>
+    <script>
+      WebAssembly.instantiateStreaming(fetch('wasm_data.gc.wasm'))
+        .then(wasmModule => {
+            alert(`2 + 1 = ${wasmModule.instance.exports.add_one(2)}`);
+        });
+    </script>
+  </head>
+  <body>
+    <a>
+      <img border="0" src="http://jenkins-x.io/images/logo.png" width="300" height="300"/>
+    </a>
+  </body>
+</html>
