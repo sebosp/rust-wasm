@@ -1,5 +1,5 @@
 [package]
-name = "wasm_data"
+name = "wasm-data"
 version = "0.1.0"
 authors = ["Seb Ospina"]
 

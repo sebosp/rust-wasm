@@ -1,4 +1,2 @@
-FROM centos:7
-EXPOSE 8080
-CMD ["/rust-wasm"]
-COPY ./ /
+FROM rust:1.27.2
+COPY . /code

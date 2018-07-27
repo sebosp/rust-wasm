@@ -9,24 +9,6 @@ pipeline {
     RUST_VERSION      = '1.27.1'
   }
   stages {
-    stage('Prepare WASM GC files') {
-      steps {
-        dir ('./wasm-data') {
-          container('rust') {
-            sh 'rustup override set nightly'
-            sh 'rustup default nightly'
-            sh 'rustup target add wasm32-unknown-unknown --toolchain nightly'
-            sh 'cargo install wasm-gc'
-            sh 'git clone --depth 1 https://github.com/juj/emsdk.git'
-            sh 'emsdk/emsdk install latest'
-            sh 'emsdk/emsdk activate latest'
-            sh 'cargo +nightly build --target wasm32-unknown-unknown --release'
-            sh '~/.cargo/bin/wasm-gc target/wasm32-unknown-unknown/release/wasm_data.wasm -o target/wasm32-unknown-unknown/release/wasm_data.gc.wasm'
-            stash includes: 'target/wasm32-unknown-unknown/release/wasm_data.gc.wasm', name: 'wasm_data'
-          }
-        }
-      }
-    }
     stage('CI Build and push snapshot') {
       when {
         anyOf {
@@ -40,12 +22,17 @@ pipeline {
         HELM_RELEASE = "$PREVIEW_NAMESPACE".toLowerCase()
       }
       steps {
-        dir ('./static') {
-          unstash 'wasm_data'
-        }
         container('rust') {
           sh 'rustup override set nightly'
-          sh 'cargo install'
+          sh 'rustup default nightly'
+          sh 'rustup target add wasm32-unknown-unknown --toolchain nightly'
+          sh 'cargo install wasm-gc'
+          sh 'git clone --depth 1 https://github.com/juj/emsdk.git'
+          sh 'emsdk/emsdk install latest'
+          sh 'emsdk/emsdk activate latest'
+          sh 'cargo +nightly build --target wasm32-unknown-unknown --release -p wasm-data'
+          sh '~/.cargo/bin/wasm-gc target/wasm32-unknown-unknown/release/wasm_data.wasm -o static/wasm_data.gc.wasm'
+          sh 'cargo install --path .'
           sh "cp ~/.cargo/bin/rust-wasm ."
           sh 'export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml'
           sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:$PREVIEW_VERSION"
