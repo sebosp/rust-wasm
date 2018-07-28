@@ -10,7 +10,9 @@ pipeline {
   }
   stages {
     stage('Docker image with deps') {
-      sh './build.sh'
+      steps {
+        sh './build.sh'
+      }
     }
     stage('CI Build and push snapshot') {
       when {
