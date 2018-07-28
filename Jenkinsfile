@@ -23,18 +23,8 @@ pipeline {
       }
       steps {
         container("rust") {
-/*          sh 'rustup override set nightly'
-          sh 'rustup default nightly'
-          sh 'rustup target add wasm32-unknown-unknown --toolchain nightly'
-          sh 'cargo install wasm-gc --root ./tmp'
-          sh 'git clone --depth 1 https://github.com/juj/emsdk.git'
-          sh 'emsdk/emsdk install latest'
-          sh 'emsdk/emsdk activate latest'
-          sh 'cargo +nightly build --target wasm32-unknown-unknown --release -p wasm-data'
-          sh './tmp/bin/wasm-gc target/wasm32-unknown-unknown/release/wasm_data.wasm -o static/wasm_data.gc.wasm'
-          sh "cp ./target/release/rust-wasm ."*/
           sh './build.sh'
-          sh 'export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml --cache-from $APP_NAME:$RUST_VERSION'
+          sh 'export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml'
           sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:$PREVIEW_VERSION"
         }
         dir ('./charts/preview') {
