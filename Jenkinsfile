@@ -34,7 +34,7 @@ pipeline {
           sh './tmp/bin/wasm-gc target/wasm32-unknown-unknown/release/wasm_data.wasm -o static/wasm_data.gc.wasm'
           sh "cp ./target/release/rust-wasm ."*/
           sh './build.sh'
-          sh 'export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml'
+          sh 'export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml --cache-from $APP_NAME:$RUST_VERSION'
           sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:$PREVIEW_VERSION"
         }
         dir ('./charts/preview') {
