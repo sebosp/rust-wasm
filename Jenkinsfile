@@ -6,9 +6,12 @@ pipeline {
     ORG               = 'sebosp'
     APP_NAME          = 'rust-wasm'
     CHARTMUSEUM_CREDS = credentials('jenkins-x-chartmuseum')
-    RUST_VERSION      = '1.27.1'
+    RUST_VERSION      = '1.27.2'
   }
   stages {
+    stage('Docker image with deps') {
+      sh './build.sh'
+    }
     stage('CI Build and push snapshot') {
       when {
         anyOf {
@@ -22,18 +25,19 @@ pipeline {
         HELM_RELEASE = "$PREVIEW_NAMESPACE".toLowerCase()
       }
       steps {
-        container('rust') {
-          sh 'rustup override set nightly'
+        container("${APP_NAME}:${RUST_VERSION}") {
+/*          sh 'rustup override set nightly'
           sh 'rustup default nightly'
           sh 'rustup target add wasm32-unknown-unknown --toolchain nightly'
-          sh 'cargo install wasm-gc'
+          sh 'cargo install wasm-gc --root ./tmp'
           sh 'git clone --depth 1 https://github.com/juj/emsdk.git'
           sh 'emsdk/emsdk install latest'
           sh 'emsdk/emsdk activate latest'
           sh 'cargo +nightly build --target wasm32-unknown-unknown --release -p wasm-data'
-          sh '~/.cargo/bin/wasm-gc target/wasm32-unknown-unknown/release/wasm_data.wasm -o static/wasm_data.gc.wasm'
+          sh './tmp/bin/wasm-gc target/wasm32-unknown-unknown/release/wasm_data.wasm -o static/wasm_data.gc.wasm'
+          sh "cp ./target/release/rust-wasm ."*/
+          sh 'cargo test'
           sh 'cargo install --path .'
-          sh "cp ~/.cargo/bin/rust-wasm ."
           sh 'export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml'
           sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:$PREVIEW_VERSION"
         }
