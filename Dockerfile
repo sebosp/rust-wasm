@@ -17,5 +17,8 @@ RUN cargo install wasm-gc --root /code/tmp \
   && mkdir /code/static \
   && /code/tmp/bin/wasm-gc target/wasm32-unknown-unknown/release/wasm_data.wasm -o /code/static/wasm_data.gc.wasm
 RUN cargo test \
-  && cargo install --path .
-COPY static/index.html /code/
+  && cargo install --path . \
+  && mv target/release/rust-wasm / \
+  && rm -rf target
+COPY static/index.html /code/static/
+CMD ["/rust-wasm"]
