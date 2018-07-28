@@ -15,6 +15,7 @@ WORKDIR /code
 RUN cargo install wasm-gc --root /code/tmp \
   && cargo +nightly build --target wasm32-unknown-unknown --release -p wasm-data \
   && mkdir /code/static \
-  && /code/tmp/bin/wasm-gc target/wasm32-unknown-unknown/release/wasm_data.wasm -o /code/static/wasm_data.gc.wasm \
+  && /code/tmp/bin/wasm-gc target/wasm32-unknown-unknown/release/wasm_data.wasm -o /code/static/wasm_data.gc.wasm
+RUN cargo test \
   && cargo install --path .
 COPY static/index.html /code/

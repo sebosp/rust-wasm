@@ -9,17 +9,12 @@ pipeline {
     RUST_VERSION      = '1.27.2'
   }
   stages {
-    stage('Docker image with deps') {
-      steps {
-        sh './build.sh'
-      }
-    }
     stage('CI Build and push snapshot') {
       when {
         anyOf {
-	  branch 'feature-*';
-	  branch 'PR-*'
-	}
+          branch 'feature-*';
+          branch 'PR-*'
+        }
       }
       environment {
         PREVIEW_VERSION = "0.0.0-SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER"
@@ -27,7 +22,7 @@ pipeline {
         HELM_RELEASE = "$PREVIEW_NAMESPACE".toLowerCase()
       }
       steps {
-        container("${APP_NAME}:${RUST_VERSION}") {
+        container("rust") {
 /*          sh 'rustup override set nightly'
           sh 'rustup default nightly'
           sh 'rustup target add wasm32-unknown-unknown --toolchain nightly'
@@ -38,12 +33,11 @@ pipeline {
           sh 'cargo +nightly build --target wasm32-unknown-unknown --release -p wasm-data'
           sh './tmp/bin/wasm-gc target/wasm32-unknown-unknown/release/wasm_data.wasm -o static/wasm_data.gc.wasm'
           sh "cp ./target/release/rust-wasm ."*/
-          sh 'cargo test'
+          sh './build.sh'
           sh 'cargo install --path .'
           sh 'export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml'
           sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:$PREVIEW_VERSION"
         }
-
         dir ('./charts/preview') {
           container('rust') {
             sh "make preview"
