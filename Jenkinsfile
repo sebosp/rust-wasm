@@ -39,9 +39,6 @@ pipeline {
         branch 'master'
       }
       steps {
-        dir ('./static') {
-          unstash 'wasm_data'
-        }
         container('rust') {
           // ensure we're not on a detached head
           sh "git checkout master"
@@ -57,13 +54,7 @@ pipeline {
           }
         }
         container('rust') {
-          // seems we need to upgrade rust else we get compile errors using Rust 1.24.1
-          sh 'rustup override set nightly'
-          sh "cargo install"
-          sh "cp ~/.cargo/bin/rust-wasm ."
-
           sh 'export VERSION=`cat VERSION` && skaffold build -f skaffold.yaml'
-
           sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:\$(cat VERSION)"
         }
       }

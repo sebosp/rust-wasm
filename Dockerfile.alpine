@@ -1,0 +1,35 @@
+# This image is not yet working.
+FROM alpine:3.8
+MAINTAINER Seb Ospina <kraige@gmail.com>
+ENV RUSTUP_TOOLCHAIN stable-x86_64-unknown-linux-musl
+RUN apk add --update llvm-libunwind rust cargo git musl-dev gcc make zlib-dev openssl-dev perl \
+  && git clone https://github.com/rust-lang-nursery/rustup.rs.git \
+  && cd rustup.rs \
+  && cargo build --release \
+  && mv target/release/rustup-init /usr/bin/rustup-init \
+  && cargo del rust cargo make gcc zlib-dev openssl-dev perl \
+  && rustup-init --no-modify-path --default-toolchain nightly -y \
+  && mv ~/.cargo/bin/* /usr/bin/
+RUN rustup override set nightly \
+  && rustup default nightly \
+  && rustup target add wasm32-unknown-unknown --toolchain nightly \
+  && git clone --depth 1 https://github.com/juj/emsdk.git \
+  && emsdk/emsdk install latest \
+  && emsdk/emsdk activate latest \
+  && mkdir /code
+COPY Cargo.toml /code/Cargo.toml
+COPY Rocket.toml /code/Rocket.toml
+COPY wasm-data /code/wasm-data
+COPY src /code/src
+WORKDIR /code
+RUN cargo install wasm-gc --root /code/tmp \
+  && cargo +nightly build --target wasm32-unknown-unknown --release -p wasm-data \
+  && mkdir /code/static \
+  && /code/tmp/bin/wasm-gc target/wasm32-unknown-unknown/release/wasm_data.wasm -o /code/static/wasm_data.gc.wasm \
+  && rm -rf /code/tmp
+RUN cargo test \
+  && cargo install --path . \
+  && mv target/release/rust-wasm / \
+  && rm -rf target
+COPY static/index.html /code/static/
+CMD ["/rust-wasm"]
