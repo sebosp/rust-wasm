@@ -4,8 +4,9 @@ pub extern fn add_one(a: u32) -> u32 {
 }
 #[cfg(test)]
 mod tests {
+    use super::*;
     #[test]
     fn it_works() {
-        assert_eq!(2 + 2, 4);
+        assert_eq!(add_one(1), 2);
     }
 }
