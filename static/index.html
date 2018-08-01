@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script>
+    <!--<script>
       WebAssembly.instantiateStreaming(fetch('wasm_data.gc.wasm'))
         .then(wasmModule => {
             alert(`2 + 1 = ${wasmModule.instance.exports.add_one(2)}`);
         });
-    </script>
+    </script>-->
   </head>
   <body>
+    <script src='./bootstrap.js'></script>
     <a>
-      <img border="0" src="http://jenkins-x.io/images/logo.png" width="300" height="300"/>
+      <img border="0" src="http://jenkins-x.io/images/logo.png" width="60" height="60"/>
+      <img border="0" src="https://github.com/carlosbaraza/web-assembly-logo/blob/master/dist/logo/web-assembly-logo-black.png?raw=true" width="60" height="60"/>
     </a>
   </body>
 </html>
