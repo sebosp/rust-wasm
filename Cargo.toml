@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = ["Seb Ospina"]
 
 [dependencies]
-rocket = "0.3.6"
+rocket = "0.4.7"
 rocket_codegen = "0.3.6"
 wasm-data = { path = "wasm-data" }
 
